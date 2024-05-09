@@ -16,19 +16,39 @@ function generateAttributesQuery(attributes): string {
     let query = "";
     for (const [attribute_name, _] of Object.entries(attributes)) {
         query += `${attribute_name}` + " ";
-        for (const [property_name, property_value] of Object.entries(attributes[attribute_name])) {
-            if (property_name === "type") {
-                if (property_value === "text") query += "TEXT "
-                else if (property_value === "numeric") query += "NUMERIC "
-                else if (property_value === "serial") query += "SERIAL "
-                else if (property_value === "date") query += "DATE "
-            } else {
-                if (property_name === "primary" && property_value === true) query += "PRIMARY KEY "
-                if (property_name === "unique" && property_value === true) query += "UNIQUE "
-                if (property_name === "notNull" && property_value === true) query += "NOT NULL "
-            }
+        const type = attributes[attribute_name]["type"];
+        const primary = attributes[attribute_name]["primary"];
+        const unique = attributes[attribute_name]["unique"];
+        const notNull = attributes[attribute_name]["notNull"];
+        const defaultVal = attributes[attribute_name]["default"];
+
+        switch (type) {
+            case "uuid":
+                query += "UUID ";
+                break;
+            case "text":
+                query += "TEXT ";
+                break;
+            case "numeric":
+                query += "NUMERIC ";
+                break;
+            case "serial":
+                query += "SERIAL ";
+                break;
+            case "date":
+                query += "DATE ";
+                break;
         }
-        query = query.trim();
+
+        if (primary && type === "uuid") {
+            query += "PRIMARY KEY DEFAULT gen_random_uuid(), ";
+            continue;
+        }
+        if (primary) query += "PRIMARY KEY "
+        if (unique) query += "UNIQUE "
+        if (notNull) query += "NOT NULL "
+        if (defaultVal) query += "DEFAULT '" + defaultVal + "'"
+
         query += ", "
     }
     query = query.trim().slice(0, -1) + ");".trim();
