@@ -2,7 +2,7 @@ import { Request, Response } from "express"
 import client from "../db";
 
 // @ts-ignore
-function generateDBQuery(entityName: string, attributes) {
+function generateDBQuery(entityName: string, attributes): string {
     let query = `CREATE TABLE IF NOT EXISTS ${entityName} (`;
     const attributeQuery = generateAttributesQuery(attributes);
 
@@ -12,7 +12,7 @@ function generateDBQuery(entityName: string, attributes) {
 }
 
 // @ts-ignore
-function generateAttributesQuery(attributes) {
+function generateAttributesQuery(attributes): string {
     let query = "";
     for (const [attribute_name, _] of Object.entries(attributes)) {
         query += `${attribute_name}` + " ";
@@ -110,6 +110,6 @@ export const deleteTable = async (req: Request, res: Response) => {
         await client.query(query + table_name)
         return res.json({ status: "success", message: "Table deleted successfully" })
     } catch (e) {
-        return res.json({ status: "error" })
+        return res.json({ error: "error" })
     }
 }
