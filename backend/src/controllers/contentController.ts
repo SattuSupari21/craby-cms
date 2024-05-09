@@ -66,6 +66,42 @@ export const deleteFromTable = async (req: Request, res: Response) => {
     }
 }
 
+export const updateInTable = async (req: Request, res: Response) => {
+    const { table_name, attributes, id } = req.body;
+    const { columns } = await getTableColumns(table_name)
+    const primaryKey = await getPrimaryKeyFromTable(table_name)
+
+    if (!id) {
+        return res.json({ error: "Primary key required" });
+    }
+
+    try {
+        const query = "SELECT * FROM " + table_name + " WHERE " + primaryKey + "=($1)";
+        const result = await client.query(query, [id]);
+        if (result.rows.length < 1) {
+            throw new Error()
+        }
+    } catch (e) {
+        return res.json({ error: "Invalid Value" })
+    }
+
+    columns.shift()
+    try {
+        let query = "UPDATE " + table_name + " SET ";
+        let colAndValue = ""
+        for (let i = 0; i < columns.length; i++) {
+            const index = columns[i] as string
+            colAndValue += columns[i] + "=" + "'" + attributes[index] + "'" + ","
+        }
+        colAndValue = colAndValue.slice(0, -1)
+        query += colAndValue + " WHERE " + primaryKey + "=($1)";
+        await client.query(query, [id]);
+        return res.json({ status: "success", message: "Entry updated successfully" });
+    } catch (e) {
+        return res.json({ error: e })
+    }
+}
+
 export const insertInTable = async (req: Request, res: Response) => {
     const { table_name, attributes } = req.body;
     const { columns, defaults } = await getTableColumns(table_name)
