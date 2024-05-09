@@ -14,8 +14,56 @@ async function getTableColumns(table_name: string) {
     }
     return { columns, defaults }
 }
-export const readFromTable = async (req: Request, res: Response) => {
 
+async function getTableData(table_name: string) {
+    const query = "SELECT * FROM " + table_name;
+    try {
+        const result = await client.query(query);
+        return { data: result.rows };
+    } catch (e) {
+        return { error: e };
+    }
+}
+
+async function getPrimaryKeyFromTable(table_name: string) {
+    // query to find primary key column
+    // official docs -> https://wiki.postgresql.org/wiki/Retrieve_primary_key_columns
+    const query = "SELECT a.attname, format_type(a.atttypid, a.atttypmod) AS data_type FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = " + "'" + table_name + "'" + " :: regclass AND i.indisprimary; ";
+    const result = await client.query(query)
+    return result.rows[0]["attname"];
+}
+
+export const readFromTable = async (req: Request, res: Response) => {
+    const { table_name } = req.body;
+    const tableData = await getTableData(table_name);
+    return res.json(tableData)
+}
+
+export const deleteFromTable = async (req: Request, res: Response) => {
+    const { table_name, id } = req.body;
+    const primaryKey = await getPrimaryKeyFromTable(table_name)
+
+    if (!id) {
+        return res.json({ error: "Primary key required" });
+    }
+
+    try {
+        const query = "SELECT * FROM " + table_name + " WHERE " + primaryKey + "=($1)";
+        const result = await client.query(query, [id]);
+        if (result.rows.length < 1) {
+            throw new Error()
+        }
+    } catch (e) {
+        return res.json({ error: "Invalid Value" })
+    }
+
+    try {
+        const query = "DELETE FROM " + table_name + " WHERE " + primaryKey + "=($1)";
+        await client.query(query, [id]);
+        return res.json({ status: "success", message: "Entry deleted successfully" });
+    } catch (e) {
+        return res.json({ error: e })
+    }
 }
 
 export const insertInTable = async (req: Request, res: Response) => {
