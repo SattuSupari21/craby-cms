@@ -36,13 +36,26 @@ function generateAttributesQuery(attributes) {
     return query;
 }
 
+async function checkTableAlreadyExists(entityName: string): Promise<Boolean> {
+    const query = "SELECT EXISTS ( SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = ($1));"
+    const table = await client.query(query, [entityName])
+    if (table.rows[0]['exists'] === true) {
+        return true;
+    }
+    return false;
+}
+
 export const getAllTables = async (req: Request, res: Response) => {
     try {
         const result = await client.query("SELECT table_name FROM information_schema.tables WHERE table_schema='public'")
         if (result.rows.length === 0) {
             return res.json()
         }
-        return res.json(result.rows[0])
+        const allTables = []
+        for (const [_, value] of Object.entries(result.rows)) {
+            allTables.push(value['table_name'])
+        }
+        return res.json({ tables: allTables })
     } catch (e) {
         return res.json({ error: e })
     }
@@ -72,9 +85,7 @@ export const createTable = async (req: Request, res: Response) => {
 
     // check if table already exists
     try {
-        const query = "SELECT EXISTS ( SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = ($1));"
-        const table = await client.query(query, [entityName])
-        if (table.rows[0]['exists'] === true) {
+        if (await checkTableAlreadyExists(entityName) === true) {
             return res.json({ error: "Table already exists" })
         }
     } catch (e) {
@@ -86,5 +97,19 @@ export const createTable = async (req: Request, res: Response) => {
         res.json({ status: "success", message: dbResponse })
     } catch (e) {
         return res.json({ error: "error" })
+    }
+}
+
+export const deleteTable = async (req: Request, res: Response) => {
+    const table_name = req.body.table_name;
+    try {
+        if (await checkTableAlreadyExists(table_name) === false) {
+            return res.json({ error: "Table does not exist" })
+        }
+        const query = "DROP TABLE ";
+        await client.query(query + table_name)
+        return res.json({ status: "success", message: "Table deleted successfully" })
+    } catch (e) {
+        return res.json({ status: "error" })
     }
 }
