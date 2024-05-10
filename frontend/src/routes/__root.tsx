@@ -23,18 +23,18 @@ export default function Component() {
                     <div className="flex-1 overflow-auto py-2">
                         <nav className="grid items-start px-2 text-sm font-medium space-y-1">
                             <Link
-                                to="/"
+                                to="/content-manager"
                                 className="flex items-center gap-3 rounded-lg px-3 py-2 transition-all [&.active]:bg-secondary hover:bg-secondary"
                             >
                                 <HomeIcon className="h-4 w-4" />
-                                Dashboard
+                                Content Manager
                             </Link>
                             <Link
                                 to="/content-types"
                                 className="flex items-center gap-3 rounded-lg px-3 py-2 transition-all [&.active]:bg-secondary hover:bg-secondary"
                             >
                                 <PackageIcon className="h-4 w-4" />
-                                Content Types
+                                Content Type Builder
                             </Link>
                         </nav>
                     </div>
