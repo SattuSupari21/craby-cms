@@ -121,7 +121,8 @@ function ContentManagerComponent() {
                                         return <ul key={index} className='list-disc list-inside'>
                                             <li className='mb-2 cursor-pointer'>{entity}</li>
                                         </ul>
-                                    })}
+                                    })
+                            }
                         </nav>
                     </div>
                 </div>

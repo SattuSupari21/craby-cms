@@ -4,7 +4,7 @@ import { createTable, deleteTable, getAllTables, getTableSchema } from "../contr
 const entityRouter = Router();
 
 entityRouter.route('/getAllTables').get(getAllTables)
-entityRouter.route('/getTableSchema').get(getTableSchema)
+entityRouter.route('/getTableSchema').post(getTableSchema)
 entityRouter.route('/createTable').post(createTable)
 entityRouter.route('/deleteTable').post(deleteTable)
 
