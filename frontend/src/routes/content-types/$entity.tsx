@@ -111,7 +111,7 @@ function Component() {
     schemaData.refetch()
 
     return (
-        <div className='flex flex-col gap-12 p-4'>
+        <div className='flex flex-col gap-12 p-8'>
             <div className='w-full flex items-center justify-between'>
                 <div className='flex flex-col gap-1'>
                     <span className='text-4xl font-medium'>{entity}</span>

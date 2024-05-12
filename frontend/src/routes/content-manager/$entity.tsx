@@ -54,7 +54,7 @@ async function getTableData(entityName: string) {
 
 function RenderEntityData({ entityName, schemaData, tableData }: { entityName: string, schemaData: UseQueryResult<any, Error>, tableData: UseQueryResult<any, Error> }) {
     return (
-        <div className='flex flex-col gap-12 p-4'>
+        <div className='flex flex-col gap-12 p-8'>
             <div className='w-full flex items-center justify-between'>
                 <div className='flex flex-col gap-1'>
                     <span className='text-4xl font-medium'>{entityName}</span>
