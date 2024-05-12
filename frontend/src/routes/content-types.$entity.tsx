@@ -120,12 +120,7 @@ function Component() {
             </div>
 
             {
-                schemaData.isPending ? <TableLoadingSkeleton /> : schemaData.data.columns.length < 0 ?
-                    <div className='w-full h-full flex flex-col items-center justify-center gap-2'>
-                        <span className='text-xl'>No Schema Found</span>
-                        <Button><PlusIcon className='w-4 h-4 mr-2' />Create Schema</Button>
-                    </div>
-                    : <RenderEntityData schemaData={schemaData} />
+                schemaData.isPending ? <TableLoadingSkeleton /> : <RenderEntityData schemaData={schemaData} />
             }
         </div>
     )
