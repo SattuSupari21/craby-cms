@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { UseQueryResult, useQuery } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
+import { Link, createFileRoute } from '@tanstack/react-router'
 import { Edit2Icon, PlusIcon, Trash } from 'lucide-react'
 import {
     Table,
@@ -60,7 +60,7 @@ function RenderEntityData({ entityName, schemaData, tableData }: { entityName: s
                     <span className='text-4xl font-medium'>{entityName}</span>
                     <span className='text-sm'>{!tableData.isPending && tableData.data.data.length} entries found</span>
                 </div>
-                <Button className='rounded-sm'><PlusIcon className='w-6 h-6 mr-2' />Create new entry</Button>
+                <Link to="/content-manager/$entity/create" params={{ entity: entityName }} ><Button className='rounded-sm'><PlusIcon className='w-6 h-6 mr-2' />Create new entry</Button></Link>
             </div>
 
             <Table className='bg-card rounded-md'>

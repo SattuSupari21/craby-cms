@@ -12,6 +12,7 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { Skeleton } from '@/components/ui/skeleton'
+import { Link } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/content-types/$entity')({
     component: Component,
@@ -116,7 +117,12 @@ function Component() {
                     <span className='text-4xl font-medium'>{entity}</span>
                     <span className='text-sm mt-1'>Build the data architecture of your content</span>
                 </div>
-                <Button variant={'outline'} className='rounded-sm border-primary text-primary'><PlusIcon className='w-6 h-6 mr-2' />Add another field</Button>
+                <Link to='/content-types/$entity/create' params={{ entity }}>
+                    <Button variant={'outline'} className='rounded-sm border-primary text-primary'>
+                        <PlusIcon className='w-6 h-6 mr-2' />
+                        Add another field
+                    </Button>
+                </Link>
             </div>
 
             {

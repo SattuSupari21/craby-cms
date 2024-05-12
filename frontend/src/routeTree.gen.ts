@@ -14,8 +14,10 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as ContentTypesImport } from './routes/content-types'
 import { Route as ContentManagerImport } from './routes/content-manager'
 import { Route as IndexImport } from './routes/index'
-import { Route as ContentTypesEntityImport } from './routes/content-types.$entity'
-import { Route as ContentManagerEntityImport } from './routes/content-manager.$entity'
+import { Route as ContentTypesEntityImport } from './routes/content-types/$entity'
+import { Route as ContentManagerEntityImport } from './routes/content-manager/$entity'
+import { Route as ContentTypesEntityCreateImport } from './routes/content-types/$entity_.create'
+import { Route as ContentManagerEntityCreateImport } from './routes/content-manager/$entity_.create'
 
 // Create/Update Routes
 
@@ -44,6 +46,18 @@ const ContentManagerEntityRoute = ContentManagerEntityImport.update({
   getParentRoute: () => ContentManagerRoute,
 } as any)
 
+const ContentTypesEntityCreateRoute = ContentTypesEntityCreateImport.update({
+  path: '/$entity/create',
+  getParentRoute: () => ContentTypesRoute,
+} as any)
+
+const ContentManagerEntityCreateRoute = ContentManagerEntityCreateImport.update(
+  {
+    path: '/$entity/create',
+    getParentRoute: () => ContentManagerRoute,
+  } as any,
+)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -68,6 +82,14 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContentTypesEntityImport
       parentRoute: typeof ContentTypesImport
     }
+    '/content-manager/$entity/create': {
+      preLoaderRoute: typeof ContentManagerEntityCreateImport
+      parentRoute: typeof ContentManagerImport
+    }
+    '/content-types/$entity/create': {
+      preLoaderRoute: typeof ContentTypesEntityCreateImport
+      parentRoute: typeof ContentTypesImport
+    }
   }
 }
 
@@ -75,8 +97,14 @@ declare module '@tanstack/react-router' {
 
 export const routeTree = rootRoute.addChildren([
   IndexRoute,
-  ContentManagerRoute.addChildren([ContentManagerEntityRoute]),
-  ContentTypesRoute.addChildren([ContentTypesEntityRoute]),
+  ContentManagerRoute.addChildren([
+    ContentManagerEntityRoute,
+    ContentManagerEntityCreateRoute,
+  ]),
+  ContentTypesRoute.addChildren([
+    ContentTypesEntityRoute,
+    ContentTypesEntityCreateRoute,
+  ]),
 ])
 
 /* prettier-ignore-end */
