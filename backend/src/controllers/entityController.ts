@@ -66,12 +66,12 @@ async function checkTableAlreadyExists(entityName: string): Promise<Boolean> {
 }
 
 export const getAllTables = async (req: Request, res: Response) => {
+    const allTables = []
     try {
         const result = await client.query("SELECT table_name FROM information_schema.tables WHERE table_schema='public'")
         if (result.rows.length === 0) {
-            return res.json()
+            return res.json({ tables: [] })
         }
-        const allTables = []
         for (const [_, value] of Object.entries(result.rows)) {
             allTables.push(value['table_name'])
         }

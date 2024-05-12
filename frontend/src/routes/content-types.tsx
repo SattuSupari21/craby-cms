@@ -10,27 +10,13 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { useQuery } from '@tanstack/react-query'
+import { UseQueryResult, useQuery } from '@tanstack/react-query'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useEffect, useState } from 'react'
 
 export const Route = createFileRoute('/content-types')({
     component: ContentTypeComponent
 })
-
-const schemaData = {
-    "columns": [
-        "id",
-        "mobile",
-        "name",
-        "email"
-    ],
-    "dataTypes": [
-        "uuid",
-        "numeric",
-        "text",
-        "text"
-    ]
-};
 
 function TableLoadingSkeleton() {
     return (
@@ -72,13 +58,13 @@ function TableLoadingSkeleton() {
     )
 }
 
-function RenderEntityData() {
+function RenderEntityData({ schemaData, entityName }: { schemaData: UseQueryResult<any, Error>, entityName: string }) {
     return (
         <div className='flex flex-col gap-12 p-4'>
             <div className='w-full flex items-center justify-between'>
                 <div className='flex flex-col gap-1'>
-                    <span className='text-4xl font-medium'>Person</span>
-                    <span className='text-sm'>0 entries found</span>
+                    <span className='text-4xl font-medium'>{entityName}</span>
+                    <span className='text-sm mt-1'>Build the data architecture of your content</span>
                 </div>
                 <Button variant={'outline'} className='rounded-sm border-primary text-primary'><PlusIcon className='w-6 h-6 mr-2' />Add another field</Button>
             </div>
@@ -93,10 +79,16 @@ function RenderEntityData() {
                 </TableHeader>
                 <TableBody>
                     {
-                        schemaData.columns.map((_, index) => {
+                        // @ts-ignore
+                        schemaData.data.columns.map((_, index) => {
                             return <TableRow key={index}>
-                                <TableCell>{schemaData.columns[index]}</TableCell>
-                                <TableCell>{schemaData.dataTypes[index].toUpperCase()}</TableCell>
+                                <TableCell>{
+                                    // @ts-ignore
+                                    schemaData.data.columns[index]
+                                }</TableCell>
+                                <TableCell>{// @ts-ignore
+                                    schemaData.data.dataTypes[index].toUpperCase()
+                                }</TableCell>
                                 <TableCell className='flex'>
                                     <div className='ml-auto flex gap-2'>
                                         <Button variant={'outline'} ><Edit2Icon className='w-4 h-4' /></Button>
@@ -124,8 +116,14 @@ async function getEntities() {
     return data
 }
 
-async function getSchema() {
-    const res = await fetch("http://127.0.0.1:3000/api/entity/getTableSchema", { method: "POST", body: JSON.stringify({ "table_name": "person" }) })
+async function getSchema(entity: string) {
+    const res = await fetch("http://127.0.0.1:3000/api/entity/getTableSchema", {
+        method: "POST", headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ "table_name": entity })
+    })
     if (!res.ok) {
         throw new Error()
     }
@@ -137,12 +135,16 @@ async function getSchema() {
 }
 
 function ContentTypeComponent() {
-
     const entities = useQuery({ queryKey: ['get-entities'], queryFn: getEntities })
-    const schemaData = useQuery({ queryKey: ['get-schema'], queryFn: getSchema })
+    const [entityName, setEntityName] = useState("")
+    const schemaData = useQuery({ queryKey: ['get-schema'], queryFn: () => getSchema(entityName) })
 
     if (entities.error) return "An error has occurred : " + entities.error.message
     if (schemaData.error) return "An error has occurred : " + schemaData.error.message
+
+    useEffect(() => {
+        schemaData.refetch()
+    }, [entityName])
 
     return (
         <div className="grid min-h-screen w-full grid-cols-[240px_1fr]">
@@ -163,7 +165,9 @@ function ContentTypeComponent() {
                                     // @ts-ignore
                                     entities.data.tables.map((entity, index) => {
                                         return <ul key={index} className='list-disc list-inside'>
-                                            <li className='mb-2 cursor-pointer'>{entity}</li>
+                                            <li className='mb-2 cursor-pointer' onClick={() => {
+                                                setEntityName(entity)
+                                            }}>{entity}</li>
                                         </ul>
                                     })}
                         </nav>
@@ -174,12 +178,13 @@ function ContentTypeComponent() {
 
             <div>
                 {
-                    schemaData.isPending ? <TableLoadingSkeleton /> : schemaData.data.columns.length < 0 ?
-                        <div className='w-full h-full flex flex-col items-center justify-center gap-2'>
-                            <span className='text-xl'>No Schema Found</span>
-                            <Button><PlusIcon className='w-4 h-4 mr-2' />Create Schema</Button>
-                        </div>
-                        : <RenderEntityData />
+                    entityName === "" ? <span className='text-2xl font-medium w-full h-full flex items-center justify-center'>Select or create an entity to get started</span> :
+                        schemaData.isPending ? <TableLoadingSkeleton /> : schemaData.data.columns.length < 0 ?
+                            <div className='w-full h-full flex flex-col items-center justify-center gap-2'>
+                                <span className='text-xl'>No Schema Found</span>
+                                <Button><PlusIcon className='w-4 h-4 mr-2' />Create Schema</Button>
+                            </div>
+                            : <RenderEntityData schemaData={schemaData} entityName={entityName} />
                 }
             </div>
         </div >

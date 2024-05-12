@@ -4,8 +4,8 @@ import { deleteFromTable, insertInTable, readFromTable, updateInTable } from "..
 const contentRouter = Router();
 
 contentRouter.route('/insertInTable').post(insertInTable);
-contentRouter.route('/readFromTable').get(readFromTable);
-contentRouter.route('/deleteFromTable').get(deleteFromTable);
-contentRouter.route('/updateInTable').post(updateInTable);
+contentRouter.route('/readFromTable').post(readFromTable);
+contentRouter.route('/deleteFromTable').delete(deleteFromTable);
+contentRouter.route('/updateInTable').put(updateInTable);
 
 export default contentRouter;
