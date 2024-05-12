@@ -33,6 +33,12 @@ async function getPrimaryKeyFromTable(table_name: string) {
     return result.rows[0]["attname"];
 }
 
+export const getPrimaryKey = async (req: Request, res: Response) => {
+    const { table_name } = req.body;
+    const pk = await getPrimaryKeyFromTable(table_name)
+    return res.json({ pk })
+}
+
 export const readFromTable = async (req: Request, res: Response) => {
     const { table_name } = req.body;
     const tableData = await getTableData(table_name);

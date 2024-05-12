@@ -11,6 +11,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
+import { toast } from '@/components/ui/use-toast'
 
 export const Route = createFileRoute('/content-manager/$entity')({
     component: Component
@@ -52,6 +53,40 @@ async function getTableData(entityName: string) {
     return data
 }
 
+async function deleteEntry(entityName: string, tableEntry: {}, tableData: UseQueryResult<any, Error>) {
+    const pk_res = await fetch("http://127.0.0.1:3000/api/content/getPrimaryKey", {
+        method: "POST", headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ "table_name": entityName })
+    })
+
+    let pk = ""
+    if (pk_res.ok) {
+        const data = await pk_res.json()
+        pk = data.pk
+    }
+
+    const res = await fetch("http://127.0.0.1:3000/api/content/deleteFromTable", {
+        method: "DELETE", headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        // @ts-ignore
+        body: JSON.stringify({ "table_name": entityName, "id": tableEntry[pk] })
+    })
+    tableData.refetch();
+    if (!res.ok) {
+        return toast({ title: "Error", description: "An error occurred" })
+    }
+    const data = await res.json()
+    if (data.error) {
+        return toast({ title: "Error", description: "An error occurred" })
+    }
+    return toast({ title: "Success", description: "Entry deleted successfully" })
+}
+
 function RenderEntityData({ entityName, schemaData, tableData }: { entityName: string, schemaData: UseQueryResult<any, Error>, tableData: UseQueryResult<any, Error> }) {
     return (
         <div className='flex flex-col gap-12 p-8'>
@@ -87,7 +122,9 @@ function RenderEntityData({ entityName, schemaData, tableData }: { entityName: s
                                 <TableCell className='flex'>
                                     <div className='ml-auto flex gap-2'>
                                         <Button variant={'outline'} ><Edit2Icon className='w-4 h-4' /></Button>
-                                        <Button variant={'outline'} ><Trash className='w-4 h-4' /></Button>
+                                        <Button variant={'outline'} onClick={() => {
+                                            deleteEntry(entityName, data, tableData)
+                                        }}  ><Trash className='w-4 h-4' /></Button>
                                     </div>
                                 </TableCell>
 
