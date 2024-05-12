@@ -77,11 +77,11 @@ function RenderEntityData({ entityName, schemaData, tableData }: { entityName: s
                 <TableBody>
                     {
                         // @ts-ignore
-                        !tableData.isPending && tableData.data.data.map((data) => {
-                            return <TableRow>
+                        !tableData.isPending && tableData.data.data.map((data, index: number) => {
+                            return <TableRow key={index}>
                                 {
-                                    !schemaData.isPending && schemaData.data.columns.map((col: string) => {
-                                        return <TableCell>{data[col]}</TableCell>
+                                    !schemaData.isPending && schemaData.data.columns.map((col: string, index: number) => {
+                                        return <TableCell key={index}>{data[col]}</TableCell>
                                     })
                                 }
                                 <TableCell className='flex'>

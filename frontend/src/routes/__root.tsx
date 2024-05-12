@@ -1,4 +1,5 @@
 import { ModeToggle } from '@/components/mode-toggle'
+import { Toaster } from '@/components/ui/toaster'
 import { createRootRoute, Link, Outlet } from '@tanstack/react-router'
 import { Package2Icon, HomeIcon, PackageIcon, UserIcon, ArrowRight } from 'lucide-react'
 
