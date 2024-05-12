@@ -14,6 +14,7 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as ContentTypesImport } from './routes/content-types'
 import { Route as ContentManagerImport } from './routes/content-manager'
 import { Route as IndexImport } from './routes/index'
+import { Route as ContentTypesEntityImport } from './routes/content-types.$entity'
 
 // Create/Update Routes
 
@@ -32,6 +33,11 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const ContentTypesEntityRoute = ContentTypesEntityImport.update({
+  path: '/$entity',
+  getParentRoute: () => ContentTypesRoute,
+} as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -48,6 +54,10 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContentTypesImport
       parentRoute: typeof rootRoute
     }
+    '/content-types/$entity': {
+      preLoaderRoute: typeof ContentTypesEntityImport
+      parentRoute: typeof ContentTypesImport
+    }
   }
 }
 
@@ -56,7 +66,7 @@ declare module '@tanstack/react-router' {
 export const routeTree = rootRoute.addChildren([
   IndexRoute,
   ContentManagerRoute,
-  ContentTypesRoute,
+  ContentTypesRoute.addChildren([ContentTypesEntityRoute]),
 ])
 
 /* prettier-ignore-end */
