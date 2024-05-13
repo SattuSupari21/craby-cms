@@ -13,12 +13,63 @@ import {
 } from "@/components/ui/select"
 import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
+import { useState } from 'react'
 
 export const Route = createFileRoute('/content-types/new')({
     component: NewEntityComponent
 })
 
+const constraints = [
+    {
+        value: "primary",
+        text: "Primary"
+    },
+    {
+        value: "unique",
+        text: "Unique"
+    },
+    {
+        value: "notNull",
+        text: "Not Null"
+    }
+];
+
 function NewEntityComponent() {
+    const newEntity = {
+        entityName: "",
+        attributes: {}
+    }
+
+    const [entityName, setEntityName] = useState("");
+    const [fieldName, setFieldName] = useState("");
+    const [defaultValue, setDefaultValue] = useState("");
+    const [newEntityConstraints, setNewEntityConstraints] = useState({
+        "primary": false,
+        "unique": false,
+        "notNull": false,
+        "default": null
+    })
+
+    const handleChange = (val: string) => {
+        let updatedValue = {};
+        // @ts-ignore
+        updatedValue = { [val]: !newEntityConstraints[val] };
+        setNewEntityConstraints(newEntityConstraints => ({
+            ...newEntityConstraints,
+            ...updatedValue
+        }));
+    }
+
+    const handleNewEntity = () => {
+        newEntity.entityName = entityName;
+        newEntity.attributes = {
+            [fieldName]: newEntityConstraints
+        }
+        // @ts-ignore
+        newEntity.attributes[fieldName].default = defaultValue;
+        console.log(newEntity)
+    }
+
     return (
         <div className='flex flex-col gap-2 p-8'>
             <Link to='/content-types' className='flex gap-2 text-primary'><ArrowLeft />Back</Link>
@@ -30,14 +81,14 @@ function NewEntityComponent() {
             <Card className='max-w-4xl mt-12 flex flex-col gap-6 p-4'>
                 <div className='space-y-2'>
                     <span>Entity name</span>
-                    <Input type="text" />
+                    <Input type="text" onChange={(e) => setEntityName(e.target.value)} />
                 </div>
                 <div className='flex flex-col gap-2 mt-2'>
                     <span>Create a new field for your entity</span>
                     <div className='flex gap-2 items-center'>
                         <div className='flex-1'>
                             <span>Name</span>
-                            <Input type="text" />
+                            <Input type="text" onChange={(e) => setFieldName(e.target.value)} />
                         </div>
                         <div className='flex-1'>
                             <span>Select type of field</span>
@@ -58,26 +109,24 @@ function NewEntityComponent() {
                     <div className='flex gap-2 items-center'>
                         <div className='flex-1'>
                             <span>Default value</span>
-                            <Input type='text' />
+                            <Input type='text' onChange={(e) => setDefaultValue(e.target.value)} />
                         </div>
                         <div className='flex-1 flex items-center justify-evenly'>
-                            <div className='space-x-2'>
-                                <Checkbox id="primary" />
-                                <span>Primary</span>
-                            </div>
-                            <div className='space-x-2'>
-                                <Checkbox id="unique" />
-                                <span>Unique</span>
-                            </div>
-                            <div className='space-x-2'>
-                                <Checkbox id="notNull" />
-                                <span>Not Null</span>
-                            </div>
-
+                            {
+                                constraints.map((val, index) => {
+                                    return <div className='space-x-2' key={index}>
+                                        <Checkbox
+                                            id={val.value}
+                                            value={val.value}
+                                            onCheckedChange={() => handleChange(val.value)} />
+                                        <span>{val.text}</span>
+                                    </div>
+                                })
+                            }
                         </div>
                     </div>
                 </div>
-                <Button>Finish</Button>
+                <Button onClick={() => handleNewEntity()}>Finish</Button>
             </Card>
         </div>
     )
