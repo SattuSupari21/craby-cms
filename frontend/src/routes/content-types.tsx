@@ -48,7 +48,7 @@ function ContentTypeComponent() {
                                         </ul>
                                     })}
                         </nav>
-                        <Button variant={'link'}><PlusIcon className='w-4 h-4 mr-2' />Create new content type</Button>
+                        <Link to='/content-types/new'><Button variant={'link'}><PlusIcon className='w-4 h-4 mr-2' />Create new content type</Button></Link>
                     </div>
                 </div>
             </div>
