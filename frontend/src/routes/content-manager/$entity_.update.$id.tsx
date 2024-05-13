@@ -6,36 +6,69 @@ import { useForm } from '@tanstack/react-form';
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { ArrowLeft } from 'lucide-react';
 
-export const Route = createFileRoute('/content-manager/$entity/create')({
-    component: CreateNewEntryComponent,
+export const Route = createFileRoute('/content-manager/$entity/update/$id')({
+    component: UpdateEntryComponent,
     loader: async ({ params }) => {
-        const res = await fetch("http://127.0.0.1:3000/api/entity/getTableSchema", {
-            method: "POST", headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ "table_name": params.entity })
-        })
-        if (!res.ok) {
-            throw new Error()
-        }
-        const data = await res.json()
-        if (data.error) {
-            throw new Error()
-        }
-        data.columns.shift()
-        return data
+        const schemaData = await getSchema(params.entity);
+        const tableData = await getTableData(params.entity, params.id);
+        return { schemaData, tableData };
     }
 })
+
+async function getSchema(entity: string) {
+    const res = await fetch("http://127.0.0.1:3000/api/entity/getTableSchema", {
+        method: "POST", headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ "table_name": entity })
+    })
+    if (!res.ok) {
+        throw new Error()
+    }
+    const data = await res.json()
+    if (data.error) {
+        throw new Error()
+    }
+    if (data.dataTypes[0] === "uuid" || data.dataTypes[0] === "serial") {
+        data.columns.shift()
+        data.dataTypes.shift()
+    }
+
+    return data
+}
+
+async function getTableData(entity: string, id: string) {
+    const res = await fetch("http://127.0.0.1:3000/api/content/readFromTableById", {
+        method: "POST", headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ "table_name": entity, "id": id })
+    })
+    if (!res.ok) {
+        throw new Error()
+    }
+    const data = await res.json()
+    if (data.error) {
+        throw new Error()
+    }
+
+    return data
+}
 
 type SchemaDataType = {
     columns: Array<string>,
     dataTypes: Array<string>
 };
 
-function CreateNewEntryComponent() {
-    const { entity } = Route.useParams();
-    const schemaData: SchemaDataType = Route.useLoaderData();
+type TableDataType = {
+    data: [{}]
+}
+
+function UpdateEntryComponent() {
+    const { entity, id } = Route.useParams();
+    const { schemaData, tableData }: { schemaData: SchemaDataType, tableData: TableDataType } = Route.useLoaderData();
 
     const form = useForm({
         defaultValues: schemaData.columns,
@@ -50,21 +83,28 @@ function CreateNewEntryComponent() {
                     attributes[att_name] = att_value
                 }
             }
-            console.log(attributes)
-            const res = await fetch("http://127.0.0.1:3000/api/content/insertInTable", {
-                method: "POST",
+
+            for (let i = 0; i < schemaData.columns.length; i++) {
+                const val = schemaData.columns[i];
+                if (!Object.keys(attributes).includes(val)) {
+                    // @ts-ignore
+                    attributes[val] = tableData.data[0][val]
+                }
+            }
+
+            const res = await fetch("http://127.0.0.1:3000/api/content/updateInTable", {
+                method: "PUT",
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ "table_name": entity, attributes })
+                body: JSON.stringify({ "table_name": entity, id, attributes })
             })
             if (!res.ok) return toast({ title: "Error", description: "An error has occurred" })
             const data = await res.json()
             if (data.error) return toast({ title: "Error", description: "An error has occurred" })
 
-            return toast({ title: "Success", description: "Added new entry!" })
-
+            return toast({ title: "Success", description: "Updated entry!" })
         },
     })
 
@@ -87,7 +127,7 @@ function CreateNewEntryComponent() {
             >
                 <div className='w-full flex items-center justify-between'>
                     <div className='flex flex-col gap-1'>
-                        <span className='text-4xl font-medium'>Create an entry</span>
+                        <span className='text-4xl font-medium'>Update an entry</span>
                         <span className='text-sm mt-1'>ENTITY NAME: {entity}</span>
                     </div>
 
@@ -95,7 +135,7 @@ function CreateNewEntryComponent() {
                         selector={(state) => [state.canSubmit, state.isSubmitting]}
                         children={([canSubmit, isSubmitting]) => (
                             <Button type="submit" disabled={!canSubmit}>
-                                {isSubmitting ? 'Saving...' : 'Save'}
+                                {isSubmitting ? 'Updating...' : 'Update'}
                             </Button>
                         )}
                     />
@@ -112,7 +152,9 @@ function CreateNewEntryComponent() {
                                     children={(field) => (
                                         <Input
                                             name={field.name}
-                                            type={getType(schemaData.dataTypes[schemaData.dataTypes[0] === "uuid" ? index + 1 : index])}
+                                            type={getType(schemaData.dataTypes[index])}
+                                            // @ts-ignore
+                                            defaultValue={tableData.data[0][field.name]}
                                             value={field.state.value}
                                             onBlur={field.handleBlur}
                                             onChange={(e) => field.handleChange(e.target.value)}

@@ -45,6 +45,19 @@ export const readFromTable = async (req: Request, res: Response) => {
     return res.json(tableData)
 }
 
+export const readFromTableById = async (req: Request, res: Response) => {
+    const { table_name, id } = req.body;
+    const pk = await getPrimaryKeyFromTable(table_name)
+    try {
+        const query = "SELECT * FROM " + table_name + " WHERE " + pk + "=($1)";
+        const result = await client.query(query, [id]);
+        return res.json({ data: result.rows })
+    } catch (e) {
+        return res.json({ error: e })
+    }
+
+}
+
 export const deleteFromTable = async (req: Request, res: Response) => {
     const { table_name, id } = req.body;
     const primaryKey = await getPrimaryKeyFromTable(table_name)
