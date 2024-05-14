@@ -42,6 +42,7 @@ function NewEntityComponent() {
 
     const [entityName, setEntityName] = useState("");
     const [fieldName, setFieldName] = useState("");
+    const [fieldType, setFieldType] = useState("");
     const [defaultValue, setDefaultValue] = useState("");
     const [newEntityConstraints, setNewEntityConstraints] = useState({
         "primary": false,
@@ -65,6 +66,8 @@ function NewEntityComponent() {
         newEntity.attributes = {
             [fieldName]: newEntityConstraints
         }
+        // @ts-ignore
+        newEntity.attributes[fieldName].type = fieldType;
         // @ts-ignore
         newEntity.attributes[fieldName].default = defaultValue;
         console.log(newEntity)
@@ -92,7 +95,7 @@ function NewEntityComponent() {
                         </div>
                         <div className='flex-1'>
                             <span>Select type of field</span>
-                            <Select>
+                            <Select onValueChange={(value) => setFieldType(value)}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Type" />
                                 </SelectTrigger>
@@ -127,7 +130,7 @@ function NewEntityComponent() {
                     </div>
                 </div>
                 <Button onClick={() => handleNewEntity()}>Finish</Button>
-            </Card>
-        </div>
+            </Card >
+        </div >
     )
 }
