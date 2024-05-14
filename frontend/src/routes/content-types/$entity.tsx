@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { UseQueryResult, useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import { Edit2Icon, PlusIcon, Trash } from 'lucide-react'
+import { PlusIcon } from 'lucide-react'
 import {
     Table,
     TableBody,
@@ -88,12 +88,12 @@ function RenderEntityData({ schemaData }: { schemaData: UseQueryResult<any, Erro
                                     schemaData.data.columns[index]
                                 }</TableCell>
                                 <TableCell>{schemaData.data.dataTypes[index].toUpperCase()}</TableCell>
-                                <TableCell className='flex'>
+                                {/*<TableCell className='flex'>
                                     <div className='ml-auto flex gap-2'>
                                         <Button variant={'outline'} ><Edit2Icon className='w-4 h-4' /></Button>
                                         <Button variant={'outline'} ><Trash className='w-4 h-4' /></Button>
                                     </div>
-                                </TableCell>
+                                </TableCell>*/}
                             </TableRow>
                         })
                     }

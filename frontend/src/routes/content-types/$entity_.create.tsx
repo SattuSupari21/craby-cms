@@ -93,10 +93,11 @@ function UpdateEntityComponent() {
 
     return (
         <div className='flex flex-col gap-2 p-8'>
-            <Link to='/content-types' className='flex gap-2 text-primary'><ArrowLeft />Back</Link>
+            <Link to='/content-types/$entity' params={{ entity }} className='flex gap-2 text-primary'><ArrowLeft />Back</Link>
             <div className='w-full flex items-center justify-between'>
                 <div className='flex flex-col gap-1'>
                     <span className='text-4xl font-medium'>Add another field</span>
+                    <span className='text-sm mt-1'>Entity Name: {entity}</span>
                 </div>
             </div>
             <Card className='max-w-4xl mt-12 flex flex-col gap-6 p-4'>
@@ -116,7 +117,7 @@ function UpdateEntityComponent() {
                                 <SelectContent>
                                     <SelectItem value="uuid">UUID</SelectItem>
                                     <SelectItem value="serial">Serial</SelectItem>
-                                    <SelectItem value="number">Numeric</SelectItem>
+                                    <SelectItem value="numeric">Numeric</SelectItem>
                                     <SelectItem value="text">Text</SelectItem>
                                     <SelectItem value="date">Date</SelectItem>
                                 </SelectContent>

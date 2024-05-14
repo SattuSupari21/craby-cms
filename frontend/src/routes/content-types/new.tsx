@@ -1,6 +1,6 @@
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { createFileRoute } from '@tanstack/react-router'
 import { ArrowLeft } from 'lucide-react'
 
@@ -36,6 +36,7 @@ const constraints = [
 ];
 
 function NewEntityComponent() {
+    const navigate = useNavigate({ from: '/content-types/new' })
     const newEntity = {
         entityName: "",
         attributes: {}
@@ -63,6 +64,7 @@ function NewEntityComponent() {
     }
 
     const handleNewEntity = async () => {
+
         newEntity.entityName = entityName;
         newEntity.attributes = {
             [fieldName]: newEntityConstraints
@@ -85,8 +87,9 @@ function NewEntityComponent() {
         const data = await res.json()
         if (data.error) return toast({ title: "Error", description: "An error has occurred" })
 
-        return toast({ title: "Success", description: "Added new entry!" })
+        navigate({ to: '/content-types' })
 
+        return toast({ title: "Success", description: "Added new entry!" })
     }
 
     return (
@@ -118,7 +121,7 @@ function NewEntityComponent() {
                                 <SelectContent>
                                     <SelectItem value="uuid">UUID</SelectItem>
                                     <SelectItem value="serial">Serial</SelectItem>
-                                    <SelectItem value="number">Numeric</SelectItem>
+                                    <SelectItem value="numeric">Numeric</SelectItem>
                                     <SelectItem value="text">Text</SelectItem>
                                     <SelectItem value="date">Date</SelectItem>
                                 </SelectContent>
