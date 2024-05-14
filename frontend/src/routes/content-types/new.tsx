@@ -14,6 +14,7 @@ import {
 import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
 import { useState } from 'react'
+import { toast } from '@/components/ui/use-toast'
 
 export const Route = createFileRoute('/content-types/new')({
     component: NewEntityComponent
@@ -61,7 +62,7 @@ function NewEntityComponent() {
         }));
     }
 
-    const handleNewEntity = () => {
+    const handleNewEntity = async () => {
         newEntity.entityName = entityName;
         newEntity.attributes = {
             [fieldName]: newEntityConstraints
@@ -71,6 +72,21 @@ function NewEntityComponent() {
         // @ts-ignore
         newEntity.attributes[fieldName].default = defaultValue;
         console.log(newEntity)
+
+        const res = await fetch("http://127.0.0.1:3000/api/entity/createTable", {
+            method: "POST",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ entityName: newEntity.entityName, attributes: newEntity.attributes })
+        })
+        if (!res.ok) return toast({ title: "Error", description: "An error has occurred" })
+        const data = await res.json()
+        if (data.error) return toast({ title: "Error", description: "An error has occurred" })
+
+        return toast({ title: "Success", description: "Added new entry!" })
+
     }
 
     return (

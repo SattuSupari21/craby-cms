@@ -3,7 +3,7 @@ import client from "../db";
 
 // @ts-ignore
 function generateDBQuery(entityName: string, attributes): string {
-    let query = `CREATE TABLE IF NOT EXISTS ${entityName} (`;
+    let query = `CREATE TABLE IF NOT EXISTS ${entityName} (id SERIAL PRIMARY KEY, `;
     const attributeQuery = generateAttributesQuery(attributes);
 
     query += attributeQuery;

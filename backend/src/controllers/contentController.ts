@@ -123,17 +123,14 @@ export const updateInTable = async (req: Request, res: Response) => {
 
 export const insertInTable = async (req: Request, res: Response) => {
     const { table_name, attributes } = req.body;
-    const { columns, defaults } = await getTableColumns(table_name)
+    const { columns } = await getTableColumns(table_name)
     const valuesToInsert = []
     for (const [_, value] of Object.entries(columns)) {
         const index = value as string
         valuesToInsert.push(attributes[index])
     }
-    // removing id column if its has a auto value generation
-    if (defaults[0] === "gen_random_uuid()") {
-        columns.shift()
-        valuesToInsert.shift()
-    }
+    columns.shift()
+    valuesToInsert.shift()
     let text = "INSERT INTO " + table_name + "(" + columns.toString() + ")" + " VALUES("
     let valuesText = ""
     for (let i = 1; i <= columns.length; i++) {

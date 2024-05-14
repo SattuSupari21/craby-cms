@@ -50,7 +50,6 @@ function CreateNewEntryComponent() {
                     attributes[att_name] = att_value
                 }
             }
-            console.log(attributes)
             const res = await fetch("http://127.0.0.1:3000/api/content/insertInTable", {
                 method: "POST",
                 headers: {
