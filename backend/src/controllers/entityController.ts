@@ -133,3 +133,44 @@ export const deleteTable = async (req: Request, res: Response) => {
         return res.json({ error: "error" })
     }
 }
+
+// @ts-ignore
+function updateDBQuery(entityName: string, attributes, colName: string) {
+    let query = `ALTER TABLE ${entityName} ADD COLUMN `;
+    const attributeQuery = generateAttributesQuery(attributes);
+
+    query += attributeQuery
+    query = query.slice(0, -2)
+    if (attributes[colName]['notNull'] === true && attributes[colName]['default'] === null) {
+        query += " DEFAULT 'foo';";
+    }
+
+    return query;
+}
+
+export const updateTable = async (req: Request, res: Response) => {
+    const { entityName, attributes, colName } = await req.body;
+    const pgQuery = updateDBQuery(entityName, attributes, colName);
+
+    // check if table already exists
+    try {
+        if (await checkTableAlreadyExists(entityName) === false) {
+            return res.json({ error: "Table does not exist" })
+        }
+    } catch (e) {
+        return res.json({ status: "error" })
+    }
+
+    try {
+        const dbResponse = await client.query(pgQuery)
+        if (attributes[colName]['notNull'] === true && attributes[colName]['default'] === null) {
+            const query = `ALTER TABLE ${entityName} ALTER COLUMN ${colName} DROP DEFAULT;`
+            await client.query(query)
+        }
+        res.json({ status: "success", message: dbResponse })
+    } catch (e) {
+        console.log(e)
+        return res.json({ error: "error" })
+    }
+
+}

@@ -24,6 +24,7 @@ export const Route = createFileRoute('/content-manager/$entity/create')({
             throw new Error()
         }
         data.columns.shift()
+        data.dataTypes.shift()
         return data
     }
 })

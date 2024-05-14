@@ -30,10 +30,8 @@ async function getSchema(entity: string) {
     if (data.error) {
         throw new Error()
     }
-    if (data.dataTypes[0] === "uuid" || data.dataTypes[0] === "serial") {
-        data.columns.shift()
-        data.dataTypes.shift()
-    }
+    data.columns.shift()
+    data.dataTypes.shift()
 
     return data
 }
