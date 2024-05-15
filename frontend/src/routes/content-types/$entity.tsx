@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { UseQueryResult, useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import { PlusIcon } from 'lucide-react'
+import { PlusIcon, Trash } from 'lucide-react'
 import {
     Table,
     TableBody,
@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/table"
 import { Skeleton } from '@/components/ui/skeleton'
 import { Link } from '@tanstack/react-router'
+import { toast } from '@/components/ui/use-toast'
 
 export const Route = createFileRoute('/content-types/$entity')({
     component: Component,
@@ -103,6 +104,24 @@ function RenderEntityData({ schemaData }: { schemaData: UseQueryResult<any, Erro
     )
 }
 
+async function deleteEntity(entity: string) {
+    const res = await fetch("http://127.0.0.1:3000/api/entity/deleteTable", {
+        method: "POST", headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ "table_name": entity })
+    })
+    if (!res.ok) {
+        return toast({ title: "Error", description: "An error occurred" })
+    }
+    const data = await res.json()
+    if (data.error) {
+        return toast({ title: "Error", description: "An error occurred" })
+    }
+    return toast({ title: "Success", description: "Entity deleted successfully" })
+}
+
 function Component() {
 
     const { entity } = Route.useParams();
@@ -117,12 +136,19 @@ function Component() {
                     <span className='text-4xl font-medium'>{entity}</span>
                     <span className='text-sm mt-1'>Build the data architecture of your content</span>
                 </div>
-                <Link to='/content-types/$entity/create' params={{ entity }}>
-                    <Button variant={'outline'} className='rounded-sm border-primary text-primary'>
-                        <PlusIcon className='w-6 h-6 mr-2' />
-                        Add another field
+                <div className='space-x-2'>
+                    <Button variant={'outline'} className='rounded-sm border-red-500 text-red-500' onClick={() => deleteEntity(entity)}>
+                        <Trash className='w-6 h-6 mr-2' />
+                        Delete Entity
                     </Button>
-                </Link>
+
+                    <Link to='/content-types/$entity/create' params={{ entity }}>
+                        <Button variant={'outline'} className='rounded-sm border-primary text-primary'>
+                            <PlusIcon className='w-6 h-6 mr-2' />
+                            Add another field
+                        </Button>
+                    </Link>
+                </div>
             </div>
 
             {
