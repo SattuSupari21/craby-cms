@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Link, Outlet, createFileRoute } from '@tanstack/react-router'
-import { PlusIcon } from 'lucide-react'
+import { PlusIcon, Trash } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { Skeleton } from '@/components/ui/skeleton'
 
@@ -23,7 +23,7 @@ async function getEntities() {
 function ContentTypeComponent() {
     const entities = useQuery({ queryKey: ['get-entities'], queryFn: getEntities, staleTime: Infinity })
 
-    if (entities.error) return "An error has occurred : " + entities.error.message
+    if (entities.error) return "An error has occurred : ";
 
     return (
         <div className="grid min-h-screen w-full grid-cols-[240px_1fr]">
@@ -44,7 +44,10 @@ function ContentTypeComponent() {
                                     // @ts-ignore
                                     entities.data.tables.map((entity, index) => {
                                         return <ul key={index} className='list-disc list-inside'>
-                                            <li className='mb-2 cursor-pointer'><Link to='/content-types/$entity' params={{ entity }} className='[&.active]:text-primary'>{entity}</Link></li>
+                                            <li className='mb-2 cursor-pointer'>
+                                                <Link to='/content-types/$entity' params={{ entity }} className='[&.active]:text-primary'>{entity}</Link>
+                                                <Trash className='w-4 h-4' />
+                                            </li>
                                         </ul>
                                     })}
                         </nav>

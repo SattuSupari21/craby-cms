@@ -20,7 +20,7 @@ async function getEntities() {
 
 function ContentManagerComponent() {
 
-    const entities = useQuery({ queryKey: ['get-entities'], queryFn: getEntities })
+    const entities = useQuery({ queryKey: ['get-entities'], queryFn: getEntities, staleTime: Infinity })
 
     if (entities.error) return "An error has occurred : " + entities.error.message
 

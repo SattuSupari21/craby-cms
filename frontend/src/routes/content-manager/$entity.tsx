@@ -12,6 +12,7 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { toast } from '@/components/ui/use-toast'
+import { format } from "date-fns"
 
 export const Route = createFileRoute('/content-manager/$entity')({
     component: Component
@@ -136,6 +137,9 @@ function RenderEntityData({ entityName, schemaData, tableData, primaryKey }: {
                             return <TableRow key={index}>
                                 {
                                     !schemaData.isPending && schemaData.data.columns.map((col: string, index: number) => {
+                                        if (schemaData.data.dataTypes[index] === "date") {
+                                            return <TableCell key={index}>{format(new Date(data[col]), "dd MMMM yyyy")}</TableCell>
+                                        }
                                         return <TableCell key={index}>{data[col]}</TableCell>
                                     })
                                 }
