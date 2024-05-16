@@ -23,7 +23,9 @@ async function getEntities() {
 function ContentTypeComponent() {
     const entities = useQuery({ queryKey: ['get-entities'], queryFn: getEntities, staleTime: Infinity })
 
-    if (entities.error) return "An error has occurred : ";
+    if (entities.error) return "Server error";
+
+    entities.refetch();
 
     return (
         <div className="grid min-h-screen w-full grid-cols-[240px_1fr]">

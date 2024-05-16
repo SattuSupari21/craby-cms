@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { UseQueryResult, useQuery } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { PlusIcon, Trash } from 'lucide-react'
 import {
     Table,
@@ -104,26 +104,28 @@ function RenderEntityData({ schemaData }: { schemaData: UseQueryResult<any, Erro
     )
 }
 
-async function deleteEntity(entity: string) {
-    const res = await fetch("http://127.0.0.1:3000/api/entity/deleteTable", {
-        method: "POST", headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ "table_name": entity })
-    })
-    if (!res.ok) {
-        return toast({ title: "Error", description: "An error occurred" })
-    }
-    const data = await res.json()
-    if (data.error) {
-        return toast({ title: "Error", description: "An error occurred" })
-    }
-    return toast({ title: "Success", description: "Entity deleted successfully" })
-}
-
 function Component() {
 
+    async function deleteEntity(entity: string) {
+        const res = await fetch("http://127.0.0.1:3000/api/entity/deleteTable", {
+            method: "POST", headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ "table_name": entity })
+        })
+        if (!res.ok) {
+            return toast({ title: "Error", description: "An error occurred" })
+        }
+        const data = await res.json()
+        if (data.error) {
+            return toast({ title: "Error", description: "An error occurred" })
+        }
+        navigate({ to: "/content-types" })
+        return toast({ title: "Success", description: "Entity deleted successfully" })
+    }
+
+    const navigate = useNavigate({ from: "/content-types/$entity" })
     const { entity } = Route.useParams();
     const schemaData = useQuery({ queryKey: ['get-schema'], queryFn: () => getSchema(entity) })
 

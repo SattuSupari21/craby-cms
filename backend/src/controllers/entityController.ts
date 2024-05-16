@@ -32,16 +32,13 @@ function generateAttributesQuery(attributes): string {
             case "numeric":
                 query += "NUMERIC ";
                 break;
-            case "serial":
-                query += "SERIAL ";
-                break;
             case "date":
                 query += "DATE ";
                 break;
         }
 
-        if (primary && type === "uuid") {
-            query += "PRIMARY KEY DEFAULT gen_random_uuid(), ";
+        if (type === "uuid") {
+            query += "NOT NULL DEFAULT gen_random_uuid(), ";
             continue;
         }
         if (primary) query += "PRIMARY KEY "

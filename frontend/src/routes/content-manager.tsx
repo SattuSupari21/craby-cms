@@ -24,6 +24,8 @@ function ContentManagerComponent() {
 
     if (entities.error) return "An error has occurred : " + entities.error.message
 
+    entities.refetch();
+
     return (
         <div className="grid min-h-screen w-full grid-cols-[240px_1fr]" >
             <div className="hidden border-r lg:block">

@@ -22,16 +22,14 @@ export const Route = createFileRoute('/content-types/$entity/create')({
 
 const constraints = [
     {
-        value: "primary",
-        text: "Primary"
-    },
-    {
         value: "unique",
-        text: "Unique"
+        text: "Unique",
+        description: "You won't be able to create an entry if there is an existing entry with identical content"
     },
     {
         value: "notNull",
-        text: "Not Null"
+        text: "Not Null",
+        description: "You won't be able to create an entry if this field is empty"
     }
 ];
 
@@ -47,7 +45,6 @@ function UpdateEntityComponent() {
     const [fieldType, setFieldType] = useState("");
     const [defaultValue, setDefaultValue] = useState("");
     const [newEntityConstraints, setNewEntityConstraints] = useState({
-        "primary": false,
         "unique": false,
         "notNull": false,
         "default": null
@@ -100,15 +97,15 @@ function UpdateEntityComponent() {
                     <span className='text-sm mt-1'>Entity Name: {entity}</span>
                 </div>
             </div>
-            <Card className='max-w-4xl mt-12 flex flex-col gap-6 p-4'>
-                <div className='flex flex-col gap-2 mt-2'>
+            <Card className='max-w-2xl mt-12 flex flex-col gap-6 p-4'>
+                <div className='flex flex-col gap-4 mt-2'>
                     <span>Create a new field for your entity</span>
-                    <div className='flex gap-2 items-center'>
-                        <div className='flex-1'>
+                    <div className='flex flex-col gap-4'>
+                        <div>
                             <span>Name</span>
                             <Input type="text" onChange={(e) => setFieldName(e.target.value)} />
                         </div>
-                        <div className='flex-1'>
+                        <div>
                             <span>Select type of field</span>
                             <Select onValueChange={(value) => setFieldType(value)}>
                                 <SelectTrigger>
@@ -116,7 +113,6 @@ function UpdateEntityComponent() {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="uuid">UUID</SelectItem>
-                                    <SelectItem value="serial">Serial</SelectItem>
                                     <SelectItem value="numeric">Numeric</SelectItem>
                                     <SelectItem value="text">Text</SelectItem>
                                     <SelectItem value="date">Date</SelectItem>
@@ -124,20 +120,23 @@ function UpdateEntityComponent() {
                             </Select>
                         </div>
                     </div>
-                    <div className='flex gap-2 items-center'>
-                        <div className='flex-1'>
+                    <div className='flex flex-col gap-4'>
+                        <div>
                             <span>Default value</span>
                             <Input type='text' onChange={(e) => setDefaultValue(e.target.value)} />
                         </div>
-                        <div className='flex-1 flex items-center justify-evenly'>
+                        <div className='flex justify-between'>
                             {
                                 constraints.map((val, index) => {
-                                    return <div className='space-x-2' key={index}>
-                                        <Checkbox
-                                            id={val.value}
-                                            value={val.value}
-                                            onCheckedChange={() => handleChange(val.value)} />
-                                        <span>{val.text}</span>
+                                    return <div className='flex flex-col gap-2' key={index}>
+                                        <div className='flex items-center gap-2'>
+                                            <Checkbox
+                                                id={val.value}
+                                                value={val.value}
+                                                onCheckedChange={() => handleChange(val.value)} />
+                                            <span>{val.text}</span>
+                                        </div>
+                                        <span className='text-sm'>{val.description}</span>
                                     </div>
                                 })
                             }

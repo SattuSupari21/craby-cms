@@ -30,8 +30,15 @@ async function getSchema(entity: string) {
     if (data.error) {
         throw new Error()
     }
+    // shift for id
     data.columns.shift()
     data.dataTypes.shift()
+    // if uuid col is present
+    if (data.dataTypes.includes("uuid")) {
+        const index = data.dataTypes.indexOf("uuid")
+        data.columns.splice(index, 1);
+        data.dataTypes.splice(index, 1);
+    }
 
     return data
 }
