@@ -13,6 +13,8 @@ import {
 } from "@/components/ui/table"
 import { toast } from '@/components/ui/use-toast'
 import { format } from "date-fns"
+import { useEffect } from 'react'
+
 
 export const Route = createFileRoute('/content-manager/$entity')({
     component: Component
@@ -133,12 +135,13 @@ function RenderEntityData({ entityName, schemaData, tableData, primaryKey }: {
                 <TableBody>
                     {
                         // @ts-ignore
-                        !tableData.isPending && tableData.data.data.map((data, index: number) => {
+                        !schemaData.isPending && !tableData.isPending && tableData.data.data.map((data, index: number) => {
+                            console.log(schemaData.data)
                             return <TableRow key={index}>
                                 {
-                                    !schemaData.isPending && schemaData.data.columns.map((col: string, index: number) => {
+                                    !schemaData.isPending && !tableData.isPending && schemaData.data.columns.map((col: string, index: number) => {
                                         if (schemaData.data.dataTypes[index] === "date") {
-                                            return <TableCell key={index}>{format(new Date(data[col]), "dd MMMM yyyy")}</TableCell>
+                                            return <TableCell key={index}>{data[col] && format(new Date(data[col]), "dd MMMM yyyy")}</TableCell>
                                         }
                                         return <TableCell key={index}>{data[col]}</TableCell>
                                     })
@@ -169,8 +172,10 @@ function Component() {
     const tableData = useQuery({ queryKey: ['get-table-data'], queryFn: () => getTableData(entity) })
     const key = useQuery({ queryKey: ['get-primary-key'], queryFn: () => getPrimaryKey(entity) })
 
-    schemaData.refetch()
-    tableData.refetch()
+    useEffect(() => {
+        schemaData.refetch()
+        tableData.refetch()
+    }, [entity])
 
     if (schemaData.error) return "An error has occurred : " + schemaData.error.message
     if (tableData.error) return "An error has occurred : " + tableData.error.message
@@ -178,11 +183,15 @@ function Component() {
 
     return (
         <div className='flex flex-col gap-12 '>
-
             {
-                !tableData.isPending && !key.isPending && <RenderEntityData entityName={entity} schemaData={schemaData} tableData={tableData} primaryKey={key.data.pk} />
+                !schemaData.isPending && !tableData.isPending && !key.isPending &&
+                <RenderEntityData
+                    entityName={entity}
+                    schemaData={schemaData}
+                    tableData={tableData}
+                    primaryKey={key.data.pk}
+                />
             }
-
         </div >
     )
 }

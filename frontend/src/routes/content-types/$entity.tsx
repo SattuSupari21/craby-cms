@@ -89,12 +89,6 @@ function RenderEntityData({ schemaData }: { schemaData: UseQueryResult<any, Erro
                                     schemaData.data.columns[index]
                                 }</TableCell>
                                 <TableCell>{schemaData.data.dataTypes[index].toUpperCase()}</TableCell>
-                                {/*<TableCell className='flex'>
-                                    <div className='ml-auto flex gap-2'>
-                                        <Button variant={'outline'} ><Edit2Icon className='w-4 h-4' /></Button>
-                                        <Button variant={'outline'} ><Trash className='w-4 h-4' /></Button>
-                                    </div>
-                                </TableCell>*/}
                             </TableRow>
                         })
                     }

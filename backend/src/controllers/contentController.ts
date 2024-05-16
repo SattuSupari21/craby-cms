@@ -34,15 +34,23 @@ async function getPrimaryKeyFromTable(table_name: string) {
 }
 
 export const getPrimaryKey = async (req: Request, res: Response) => {
-    const { table_name } = req.body;
-    const pk = await getPrimaryKeyFromTable(table_name)
-    return res.json({ pk })
+    try {
+        const { table_name } = req.body;
+        const pk = await getPrimaryKeyFromTable(table_name)
+        return res.json({ pk })
+    } catch (e) {
+        return res.json({ error: e })
+    }
 }
 
 export const readFromTable = async (req: Request, res: Response) => {
-    const { table_name } = req.body;
-    const tableData = await getTableData(table_name);
-    return res.json(tableData)
+    try {
+        const { table_name } = req.body;
+        const tableData = await getTableData(table_name);
+        return res.json(tableData)
+    } catch (e) {
+        return res.json({ error: e })
+    }
 }
 
 export const readFromTableById = async (req: Request, res: Response) => {
