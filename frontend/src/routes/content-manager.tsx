@@ -31,7 +31,7 @@ function ContentManagerComponent() {
             <div className="hidden border-r lg:block">
                 <div className="flex h-full max-h-screen flex-col gap-2">
                     <div className="flex h-[60px] items-center px-6">
-                        <span className='font-medium text-lg'>Content Types</span>
+                        <span className='font-medium text-lg'>Content Manager</span>
                     </div>
                     <div className="flex-1 overflow-auto py-2">
                         <nav className="grid items-start px-8 text-sm font-medium space-y-1 mb-4">
